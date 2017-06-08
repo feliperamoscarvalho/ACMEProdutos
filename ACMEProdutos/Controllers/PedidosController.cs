@@ -79,6 +79,18 @@ namespace ACMEProdutos.Controllers
                 return BadRequest(ModelState);
             }
 
+            if (!(pedido.Status == StatusEntrega.Processando || pedido.Status == StatusEntrega.Enviado || pedido.Status == StatusEntrega.Entregue))
+            {
+                var resposta = new HttpResponseMessage(HttpStatusCode.BadRequest)
+                {
+                    Content = new StringContent("Status preenchido de maneira incorreta"),
+                    ReasonPhrase = "Status deve ser: Processando, Enviado ou Entregue"
+                };
+                throw new HttpResponseException(resposta);
+            }
+
+            //Criar um método que faça um for nos itensPedidos e atualize o estoque de cada produto
+
             db.Pedidos.Add(pedido);
             db.SaveChanges();
 

@@ -79,6 +79,38 @@ namespace ACMEProdutos.Controllers
                 return BadRequest(ModelState);
             }
 
+            Pedido pedido = db.Pedidos.Find(itemPedido.IDPedido);
+            if (pedido == null)
+            {
+                var resposta = new HttpResponseMessage(HttpStatusCode.BadRequest)
+                {
+                    Content = new StringContent("Pedido não encontrado"),
+                    ReasonPhrase = "Pedido não encontrado"
+                };
+                throw new HttpResponseException(resposta);
+            }
+
+            Produto produto = db.Produtos.Find(itemPedido.IDProduto);
+            if (produto == null)
+            {
+                var resposta = new HttpResponseMessage(HttpStatusCode.BadRequest)
+                {
+                    Content = new StringContent("Produto não encontrado"),
+                    ReasonPhrase = "Produto não encontrado"
+                };
+                throw new HttpResponseException(resposta);
+            }
+            
+            if(itemPedido.Quantidade > produto.Estoque)
+            {
+                var resposta = new HttpResponseMessage(HttpStatusCode.BadRequest)
+                {
+                    Content = new StringContent("A quantidade pedida para o produto não está disponível em estoque"),
+                    ReasonPhrase = "Estoque insuficiente"
+                };
+                throw new HttpResponseException(resposta);
+            }
+
             db.ItemPedidos.Add(itemPedido);
             db.SaveChanges();
 
